@@ -100,10 +100,13 @@ async function handleDraw() {
     return;
   }
 
-  await openDisplayWindowIfNeeded();
-
+  // Lock out further draws immediately, synchronously, before any await -
+  // otherwise several rapid clicks can all pass the isDrawing check above
+  // while the first call is still waiting on the display window to open.
   isDrawing = true;
   drawButton.disabled = true;
+
+  await openDisplayWindowIfNeeded();
 
   const number = drawNumber(drawState);
   const speed = getSelectedSpeed();
