@@ -10,14 +10,17 @@
     <h1>Loddtrekning — Betania julebasar</h1>
 
     <section class="interval-section">
-      <label>
-        Fra og med
-        <input type="number" id="fromInput" value="1">
-      </label>
-      <label>
-        Til og med
-        <input type="number" id="toInput" value="100">
-      </label>
+      <fieldset>
+        <legend>Loddintervall</legend>
+        <label>
+          Fra og med
+          <input type="number" id="fromInput" value="1">
+        </label>
+        <label>
+          Til og med
+          <input type="number" id="toInput" value="100">
+        </label>
+      </fieldset>
     </section>
 
     <section class="settings-section">
@@ -34,10 +37,13 @@
         <label><input type="radio" name="theme" value="light"> Hvit bakgrunn, svart tekst</label>
       </fieldset>
 
-      <label>
-        <input type="checkbox" id="newWindowCheckbox">
-        Åpne trekning i eget vindu (f.eks. prosjektor)
-      </label>
+      <fieldset>
+        <legend>Visning</legend>
+        <label>
+          <input type="checkbox" id="newWindowCheckbox">
+          Åpne trekning i eget vindu (f.eks. prosjektor)
+        </label>
+      </fieldset>
     </section>
 
     <div class="button-row">
