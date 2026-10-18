@@ -158,7 +158,7 @@ fieldset legend {
   font-variant-numeric: tabular-nums;
 }
 
-/* The standalone display window (trekning.html) should cover the whole
+/* The standalone display window (visning.html) should cover the whole
    screen with the theme background, unlike the inline display embedded in
    the control panel card. */
 html:has(#displayRoot),
