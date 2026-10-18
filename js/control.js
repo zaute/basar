@@ -98,6 +98,16 @@ function handleDraw() {
     theme,
   });
 
+  function finalizeDraw() {
+    addHistoryEntry(number);
+    updateRemainingCount();
+
+    if (isExhausted(drawState)) {
+      drawButton.disabled = true;
+      showError('Alle numre i intervallet er trukket.');
+    }
+  }
+
   if (!newWindowCheckbox.checked) {
     inlineDisplay.hidden = false;
     inlineDisplay.className = `display theme-${theme}`;
@@ -111,16 +121,18 @@ function handleDraw() {
       },
       onComplete: (n) => {
         inlineNumber.textContent = String(n);
+        finalizeDraw();
       },
     });
-  }
-
-  addHistoryEntry(number);
-  updateRemainingCount();
-
-  if (isExhausted(drawState)) {
-    drawButton.disabled = true;
-    showError('Alle numre i intervallet er trukket.');
+  } else {
+    runRollingAnimation({
+      from: drawState.from,
+      to: drawState.to,
+      finalNumber: number,
+      speed,
+      onTick: () => {},
+      onComplete: finalizeDraw,
+    });
   }
 }
 
