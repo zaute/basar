@@ -29,6 +29,18 @@ body {
   margin-top: 0;
 }
 
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--color-primary-green);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
 .history-section,
 .interval-section,
 .settings-section {
@@ -164,15 +176,18 @@ fieldset legend {
 html:has(#displayRoot),
 body:has(#displayRoot) {
   height: 100%;
+  margin: 0;
   overflow: hidden;
+  background: #000;
 }
 
 #displayRoot {
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  min-height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
