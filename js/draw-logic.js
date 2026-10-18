@@ -43,3 +43,41 @@ export function drawNumber(state) {
   state.drawnNumbers.add(number);
   return number;
 }
+
+export const ANIMATION_SPEEDS = {
+  slow: { tickMs: 160, totalMs: 3000 },
+  medium: { tickMs: 90, totalMs: 1600 },
+  fast: { tickMs: 45, totalMs: 800 },
+};
+
+export function runRollingAnimation({
+  from,
+  to,
+  finalNumber,
+  speed,
+  onTick,
+  onComplete,
+  setIntervalFn = setInterval,
+  clearIntervalFn = clearInterval,
+  now = Date.now,
+}) {
+  const settings = ANIMATION_SPEEDS[speed];
+  if (!settings) {
+    throw new Error(`Ukjent hastighet: ${speed}`);
+  }
+  const { tickMs, totalMs } = settings;
+  const startTime = now();
+
+  const intervalId = setIntervalFn(() => {
+    const elapsed = now() - startTime;
+    if (elapsed >= totalMs) {
+      clearIntervalFn(intervalId);
+      onComplete(finalNumber);
+      return;
+    }
+    const randomNumber = Math.floor(Math.random() * (to - from + 1)) + from;
+    onTick(randomNumber);
+  }, tickMs);
+
+  return intervalId;
+}

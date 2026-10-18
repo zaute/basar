@@ -6,6 +6,7 @@ import {
   drawNumber,
   remainingCount,
   isExhausted,
+  runRollingAnimation,
 } from '../js/draw-logic.js';
 
 test('validateInterval accepts a valid interval', () => {
@@ -59,4 +60,60 @@ test('drawNumber throws once the interval is exhausted', () => {
   const state = createDrawState(1, 1);
   drawNumber(state);
   assert.throws(() => drawNumber(state), /allerede trukket/);
+});
+
+test('runRollingAnimation ticks random numbers then completes with the final number', () => {
+  let fakeNow = 0;
+  let tickCallback;
+  const ticks = [];
+  let completedWith = null;
+  let cleared = false;
+
+  const fakeSetInterval = (callback) => {
+    tickCallback = callback;
+    return 'fake-interval-id';
+  };
+  const fakeClearInterval = (id) => {
+    assert.equal(id, 'fake-interval-id');
+    cleared = true;
+  };
+
+  runRollingAnimation({
+    from: 1,
+    to: 10,
+    finalNumber: 7,
+    speed: 'fast',
+    onTick: (n) => ticks.push(n),
+    onComplete: (n) => {
+      completedWith = n;
+    },
+    setIntervalFn: fakeSetInterval,
+    clearIntervalFn: fakeClearInterval,
+    now: () => fakeNow,
+  });
+
+  fakeNow += 100;
+  tickCallback();
+  assert.equal(ticks.length, 1);
+  assert.equal(completedWith, null);
+
+  fakeNow += 1000;
+  tickCallback();
+  assert.equal(completedWith, 7);
+  assert.equal(cleared, true);
+});
+
+test('runRollingAnimation rejects an unknown speed', () => {
+  assert.throws(
+    () =>
+      runRollingAnimation({
+        from: 1,
+        to: 10,
+        finalNumber: 7,
+        speed: 'ludicrous',
+        onTick: () => {},
+        onComplete: () => {},
+      }),
+    /ukjent hastighet/i,
+  );
 });
