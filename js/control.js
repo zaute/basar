@@ -65,15 +65,26 @@ function updateRemainingCount() {
 
 function openDisplayWindowIfNeeded() {
   if (!newWindowCheckbox.checked) {
-    return;
+    return Promise.resolve();
   }
   if (displayWindow && !displayWindow.closed) {
-    return;
+    return Promise.resolve();
   }
   displayWindow = window.open('trekning.html', 'loddtrekningVisning');
+  if (!displayWindow) {
+    showError(
+      'Kunne ikke åpne visningsvindu. Sjekk at nettleseren ikke blokkerer popup-vinduer.',
+    );
+    return Promise.resolve();
+  }
+  // Wait for the new window to load before posting to the BroadcastChannel,
+  // otherwise its listener isn't registered yet and the first draw is lost.
+  return new Promise((resolve) => {
+    displayWindow.addEventListener('load', () => resolve(), { once: true });
+  });
 }
 
-function handleDraw() {
+async function handleDraw() {
   if (!ensureState()) {
     return;
   }
@@ -83,7 +94,7 @@ function handleDraw() {
     return;
   }
 
-  openDisplayWindowIfNeeded();
+  await openDisplayWindowIfNeeded();
 
   const number = drawNumber(drawState);
   const speed = getSelectedSpeed();
