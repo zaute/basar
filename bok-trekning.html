@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Trekk fra bok - julebasar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="control-panel">
+    <h1>Trekk fra bok — Betania julebasar</h1>
+
+    <section class="interval-section">
+      <fieldset>
+        <legend>Bokoppsett</legend>
+        <label>
+          Fra og med
+          <input type="number" id="fromInput" value="1" min="1" max="999">
+        </label>
+        <label>
+          Til og med
+          <input type="number" id="toInput" value="100" min="1" max="999">
+        </label>
+        <label>
+          Antall bøker
+          <input type="number" id="bookCountInput" value="1" min="1" max="999">
+        </label>
+      </fieldset>
+    </section>
+
+    <section class="settings-section">
+      <fieldset>
+        <legend>Animasjonshastighet</legend>
+        <label><input type="radio" name="speed" value="slow" checked> Sakte</label>
+        <label><input type="radio" name="speed" value="medium"> Middels</label>
+        <label><input type="radio" name="speed" value="fast"> Rask</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Fargetema</legend>
+        <label><input type="radio" name="theme" value="dark" checked> Svart bakgrunn, hvit tekst</label>
+        <label><input type="radio" name="theme" value="light"> Hvit bakgrunn, svart tekst</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Visning</legend>
+        <label>
+          <input type="checkbox" id="newWindowCheckbox" checked>
+          Åpne trekning i eget vindu
+        </label>
+      </fieldset>
+    </section>
+
+    <section class="history-section">
+      <fieldset>
+        <legend>Historikk (<span id="remainingCount">—</span> gjenstår)</legend>
+        <ul id="historyList"></ul>
+      </fieldset>
+    </section>
+
+    <div class="button-row">
+      <button id="drawButton">Trekk</button>
+      <button id="resetButton" type="button">Nullstill</button>
+    </div>
+    <p id="errorMessage" role="alert" hidden></p>
+
+    <section id="inlineDisplay" class="display" hidden>
+      <div id="inlineNumber" class="number">&nbsp;</div>
+    </section>
+  </main>
+
+  <script type="module" src="js/control-bok.js"></script>
+</body>
+</html>
