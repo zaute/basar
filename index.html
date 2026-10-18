@@ -2,9 +2,57 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <title>Hello World</title>
+  <title>Loddtrekning - julebasar</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Hello World</h1>
+  <main class="control-panel">
+    <h1>Loddtrekning</h1>
+
+    <section class="interval-section">
+      <label>
+        Fra og med
+        <input type="number" id="fromInput" value="1">
+      </label>
+      <label>
+        Til og med
+        <input type="number" id="toInput" value="500">
+      </label>
+    </section>
+
+    <section class="settings-section">
+      <fieldset>
+        <legend>Animasjonshastighet</legend>
+        <label><input type="radio" name="speed" value="slow"> Sakte</label>
+        <label><input type="radio" name="speed" value="medium" checked> Middels</label>
+        <label><input type="radio" name="speed" value="fast"> Rask</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Fargetema</legend>
+        <label><input type="radio" name="theme" value="dark" checked> Svart bakgrunn, hvit tekst</label>
+        <label><input type="radio" name="theme" value="light"> Hvit bakgrunn, svart tekst</label>
+      </fieldset>
+
+      <label>
+        <input type="checkbox" id="newWindowCheckbox">
+        Åpne trekning i eget vindu (f.eks. prosjektor)
+      </label>
+    </section>
+
+    <button id="drawButton">Trekk</button>
+    <p id="errorMessage" role="alert" hidden></p>
+
+    <section id="inlineDisplay" class="display" hidden>
+      <div id="inlineNumber" class="number">&nbsp;</div>
+    </section>
+
+    <section class="history-section">
+      <h2>Historikk (<span id="remainingCount">—</span> gjenstår)</h2>
+      <ul id="historyList"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="js/control.js"></script>
 </body>
 </html>
