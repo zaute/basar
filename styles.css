@@ -1,12 +1,32 @@
+:root {
+  --color-primary-green: #1b4332;
+  --color-accent-gold: #d4af37;
+  --color-accent-gold-dark: #b8962e;
+  --color-accent-red: #a4161a;
+  --color-card: #fffaf0;
+}
+
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
+  background: var(--color-primary-green);
+  min-height: 100vh;
 }
 
 .control-panel {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 2rem;
+  background: var(--color-card);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.control-panel h1 {
+  color: var(--color-primary-green);
+  letter-spacing: 0.03em;
+  text-align: center;
+  margin-top: 0;
 }
 
 .interval-section,
@@ -18,18 +38,53 @@ body {
 }
 
 fieldset {
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-accent-gold);
   border-radius: 4px;
+}
+
+fieldset legend {
+  color: var(--color-primary-green);
+  font-weight: bold;
+}
+
+.button-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 #drawButton {
   font-size: 1.5rem;
   padding: 0.75rem 2rem;
   cursor: pointer;
+  background: var(--color-accent-gold);
+  color: var(--color-primary-green);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+#drawButton:hover:not(:disabled) {
+  background: var(--color-accent-gold-dark);
+}
+
+#resetButton {
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-primary-green);
+  border: 1px solid var(--color-primary-green);
+  border-radius: 8px;
+}
+
+#resetButton:hover {
+  background: var(--color-primary-green);
+  color: var(--color-card);
 }
 
 #errorMessage {
-  color: #b00020;
+  color: var(--color-accent-red);
   font-weight: bold;
 }
 
@@ -42,9 +97,11 @@ fieldset {
 }
 
 .history-section li {
-  background: #eee;
+  background: #f1e6c8;
+  color: var(--color-primary-green);
   border-radius: 4px;
   padding: 0.25rem 0.75rem;
+  font-weight: bold;
 }
 
 .display {
@@ -59,6 +116,23 @@ fieldset {
   font-size: 20vw;
   font-weight: bold;
   font-variant-numeric: tabular-nums;
+}
+
+/* The standalone display window (trekning.html) should cover the whole
+   screen with the theme background, unlike the inline display embedded in
+   the control panel card. */
+html:has(#displayRoot),
+body:has(#displayRoot) {
+  height: 100%;
+}
+
+#displayRoot {
+  min-height: 100vh;
+  width: 100vw;
+}
+
+#displayRoot .number {
+  text-shadow: 0 0 0.5em var(--color-accent-gold);
 }
 
 .theme-dark {

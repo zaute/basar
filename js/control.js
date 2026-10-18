@@ -10,6 +10,7 @@ import {
 const fromInput = document.getElementById('fromInput');
 const toInput = document.getElementById('toInput');
 const drawButton = document.getElementById('drawButton');
+const resetButton = document.getElementById('resetButton');
 const errorMessage = document.getElementById('errorMessage');
 const historyList = document.getElementById('historyList');
 const remainingCountEl = document.getElementById('remainingCount');
@@ -148,3 +149,18 @@ async function handleDraw() {
 }
 
 drawButton.addEventListener('click', handleDraw);
+
+function resetAll() {
+  drawState = null;
+  fromInput.disabled = false;
+  toInput.disabled = false;
+  drawButton.disabled = false;
+  historyList.innerHTML = '';
+  remainingCountEl.textContent = '—';
+  showError('');
+  inlineDisplay.hidden = true;
+  inlineNumber.textContent = '\u00A0';
+  channel.postMessage({ type: 'reset' });
+}
+
+resetButton.addEventListener('click', resetAll);

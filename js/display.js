@@ -7,7 +7,16 @@ const channel = new BroadcastChannel('loddtrekning');
 
 channel.onmessage = (event) => {
   const message = event.data;
-  if (!message || message.type !== 'draw') {
+  if (!message) {
+    return;
+  }
+
+  if (message.type === 'reset') {
+    numberDisplay.textContent = '\u00A0';
+    return;
+  }
+
+  if (message.type !== 'draw') {
     return;
   }
 
