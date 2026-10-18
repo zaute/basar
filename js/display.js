@@ -2,13 +2,18 @@ import { runRollingAnimation } from './draw-logic.js';
 
 const displayRoot = document.getElementById('displayRoot');
 const numberDisplay = document.getElementById('numberDisplay');
+const drawButton = document.getElementById('drawButton');
+const historyList = document.getElementById('historyList');
 
 const channel = new BroadcastChannel('loddtrekning');
 
 // The final number is already decided by the control panel; we only delay
 // *showing* the rolling animation until the person at this window triggers
-// it with a click or the space bar (e.g. for suspense on a projector).
+// it with a click or the space bar (e.g. for suspense on a projector) —
+// unless this window itself requested the draw, in which case it plays
+// immediately since the click already happened.
 let pendingDraw = null;
+let awaitingOwnDraw = false;
 
 function showPrompt() {
   numberDisplay.textContent = 'Klikk eller trykk mellomrom for å trekke';
@@ -19,14 +24,21 @@ function clearPrompt() {
   numberDisplay.classList.remove('prompt');
 }
 
-function startPendingDraw() {
-  if (!pendingDraw) {
-    return;
-  }
-  const message = pendingDraw;
-  pendingDraw = null;
-  clearPrompt();
+function addHistoryEntry(number) {
+  const item = document.createElement('li');
+  item.textContent = String(number);
+  historyList.prepend(item);
+}
 
+function renderHistory(history) {
+  historyList.innerHTML = '';
+  for (const number of history) {
+    addHistoryEntry(number);
+  }
+}
+
+function runDraw(message) {
+  clearPrompt();
   runRollingAnimation({
     from: message.from,
     to: message.to,
@@ -37,8 +49,18 @@ function startPendingDraw() {
     },
     onComplete: (n) => {
       numberDisplay.textContent = String(n);
+      addHistoryEntry(n);
     },
   });
+}
+
+function startPendingDraw() {
+  if (!pendingDraw) {
+    return;
+  }
+  const message = pendingDraw;
+  pendingDraw = null;
+  runDraw(message);
 }
 
 channel.onmessage = (event) => {
@@ -47,10 +69,17 @@ channel.onmessage = (event) => {
     return;
   }
 
+  if (message.type === 'sync') {
+    renderHistory(message.history);
+    return;
+  }
+
   if (message.type === 'reset') {
     pendingDraw = null;
+    awaitingOwnDraw = false;
     clearPrompt();
     numberDisplay.textContent = '\u00A0';
+    historyList.innerHTML = '';
     return;
   }
 
@@ -59,14 +88,33 @@ channel.onmessage = (event) => {
   }
 
   displayRoot.className = `display theme-${message.theme}`;
+
+  if (awaitingOwnDraw) {
+    awaitingOwnDraw = false;
+    runDraw(message);
+    return;
+  }
+
   pendingDraw = message;
   showPrompt();
 };
 
-document.addEventListener('click', startPendingDraw);
+document.addEventListener('click', (event) => {
+  if (event.target === drawButton) {
+    return;
+  }
+  startPendingDraw();
+});
 document.addEventListener('keydown', (event) => {
   if (event.code === 'Space' || event.key === ' ') {
     event.preventDefault();
     startPendingDraw();
   }
 });
+
+drawButton.addEventListener('click', () => {
+  awaitingOwnDraw = true;
+  channel.postMessage({ type: 'request-draw' });
+});
+
+channel.postMessage({ type: 'request-sync' });

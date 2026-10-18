@@ -22,6 +22,7 @@ const channel = new BroadcastChannel('loddtrekning');
 
 let drawState = null;
 let displayWindow = null;
+let historyNumbers = [];
 
 function getSelectedSpeed() {
   const checked = document.querySelector('input[name="speed"]:checked');
@@ -111,6 +112,7 @@ async function handleDraw() {
   });
 
   function finalizeDraw() {
+    historyNumbers.push(number);
     addHistoryEntry(number);
     updateRemainingCount();
 
@@ -152,6 +154,7 @@ drawButton.addEventListener('click', handleDraw);
 
 function resetAll() {
   drawState = null;
+  historyNumbers = [];
   fromInput.disabled = false;
   toInput.disabled = false;
   drawButton.disabled = false;
@@ -164,3 +167,25 @@ function resetAll() {
 }
 
 resetButton.addEventListener('click', resetAll);
+
+// The display window can also trigger draws/reset and asks for a history
+// snapshot on load; the control panel stays the single source of truth for
+// the interval/settings and the set of drawn numbers.
+channel.onmessage = (event) => {
+  const message = event.data;
+  if (!message) {
+    return;
+  }
+
+  if (message.type === 'request-draw') {
+    handleDraw();
+  } else if (message.type === 'request-reset') {
+    resetAll();
+  } else if (message.type === 'request-sync') {
+    channel.postMessage({
+      type: 'sync',
+      history: historyNumbers.slice(),
+      remaining: drawState ? remainingCount(drawState) : null,
+    });
+  }
+};
