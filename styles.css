@@ -229,3 +229,35 @@ body:has(#displayRoot) {
   background: #fff;
   color: #000;
 }
+
+.welcome-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.welcome-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.welcome-button {
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  background: var(--color-accent-gold);
+  color: var(--color-primary-green);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.welcome-button:hover {
+  background: var(--color-accent-gold-dark);
+}
