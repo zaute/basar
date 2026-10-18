@@ -245,17 +245,27 @@ body:has(#displayRoot) {
 }
 
 .welcome-button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8rem;
   text-align: center;
-  font-size: 1.5rem;
-  padding: 1.5rem 2rem;
+  font-size: 2rem;
+  padding: 2rem;
   cursor: pointer;
   background: var(--color-accent-gold);
   color: var(--color-primary-green);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: bold;
   text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.welcome-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .welcome-button:hover {
