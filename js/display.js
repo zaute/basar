@@ -2,7 +2,6 @@ import { runRollingAnimation } from './draw-logic.js';
 
 const displayRoot = document.getElementById('displayRoot');
 const numberDisplay = document.getElementById('numberDisplay');
-const drawButton = document.getElementById('drawButton');
 const historyList = document.getElementById('historyList');
 
 const channel = new BroadcastChannel('loddtrekning');
@@ -39,6 +38,7 @@ function renderHistory(history) {
 
 function runDraw(message) {
   clearPrompt();
+  numberDisplay.textContent = '\u00A0';
   runRollingAnimation({
     from: message.from,
     to: message.to,
@@ -55,12 +55,17 @@ function runDraw(message) {
 }
 
 function startPendingDraw() {
-  if (!pendingDraw) {
+  if (pendingDraw) {
+    const message = pendingDraw;
+    pendingDraw = null;
+    runDraw(message);
     return;
   }
-  const message = pendingDraw;
-  pendingDraw = null;
-  runDraw(message);
+
+  // No draw is waiting to be revealed, so this click/space press is a
+  // request to draw a brand-new number from within this window.
+  awaitingOwnDraw = true;
+  channel.postMessage({ type: 'request-draw' });
 }
 
 channel.onmessage = (event) => {
@@ -99,10 +104,7 @@ channel.onmessage = (event) => {
   showPrompt();
 };
 
-document.addEventListener('click', (event) => {
-  if (event.target === drawButton) {
-    return;
-  }
+document.addEventListener('click', () => {
   startPendingDraw();
 });
 document.addEventListener('keydown', (event) => {
@@ -110,11 +112,6 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     startPendingDraw();
   }
-});
-
-drawButton.addEventListener('click', () => {
-  awaitingOwnDraw = true;
-  channel.postMessage({ type: 'request-draw' });
 });
 
 channel.postMessage({ type: 'request-sync' });
