@@ -13,6 +13,7 @@ const channel = new BroadcastChannel('loddtrekning');
 // immediately since the click already happened.
 let pendingDraw = null;
 let awaitingOwnDraw = false;
+let isAnimating = false;
 
 function showPrompt() {
   numberDisplay.textContent = 'Klikk eller trykk mellomrom for å trekke';
@@ -37,6 +38,7 @@ function renderHistory(history) {
 }
 
 function runDraw(message) {
+  isAnimating = true;
   clearPrompt();
   numberDisplay.textContent = '\u00A0';
   runRollingAnimation({
@@ -50,11 +52,16 @@ function runDraw(message) {
     onComplete: (n) => {
       numberDisplay.textContent = String(n);
       addHistoryEntry(n);
+      isAnimating = false;
     },
   });
 }
 
 function startPendingDraw() {
+  if (isAnimating) {
+    return;
+  }
+
   if (pendingDraw) {
     const message = pendingDraw;
     pendingDraw = null;
@@ -82,6 +89,7 @@ channel.onmessage = (event) => {
   if (message.type === 'reset') {
     pendingDraw = null;
     awaitingOwnDraw = false;
+    isAnimating = false;
     clearPrompt();
     numberDisplay.textContent = '\u00A0';
     historyList.innerHTML = '';
@@ -89,6 +97,10 @@ channel.onmessage = (event) => {
   }
 
   if (message.type !== 'draw') {
+    return;
+  }
+
+  if (isAnimating) {
     return;
   }
 

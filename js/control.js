@@ -23,6 +23,7 @@ const channel = new BroadcastChannel('loddtrekning');
 let drawState = null;
 let displayWindow = null;
 let historyNumbers = [];
+let isDrawing = false;
 
 function getSelectedSpeed() {
   const checked = document.querySelector('input[name="speed"]:checked');
@@ -87,6 +88,9 @@ function openDisplayWindowIfNeeded() {
 }
 
 async function handleDraw() {
+  if (isDrawing) {
+    return;
+  }
   if (!ensureState()) {
     return;
   }
@@ -97,6 +101,9 @@ async function handleDraw() {
   }
 
   await openDisplayWindowIfNeeded();
+
+  isDrawing = true;
+  drawButton.disabled = true;
 
   const number = drawNumber(drawState);
   const speed = getSelectedSpeed();
@@ -116,9 +123,12 @@ async function handleDraw() {
     addHistoryEntry(number);
     updateRemainingCount();
 
+    isDrawing = false;
     if (isExhausted(drawState)) {
       drawButton.disabled = true;
       showError('Alle numre i intervallet er trukket.');
+    } else {
+      drawButton.disabled = false;
     }
   }
 
@@ -155,6 +165,7 @@ drawButton.addEventListener('click', handleDraw);
 function resetAll() {
   drawState = null;
   historyNumbers = [];
+  isDrawing = false;
   fromInput.disabled = false;
   toInput.disabled = false;
   drawButton.disabled = false;
