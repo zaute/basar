@@ -9,12 +9,26 @@ Se designspesifikasjonen i
 
 ## Bruk
 
-1. Åpne `index.html` i nettleseren (via en lokal server, se under).
-2. Angi loddintervall ("fra og med" / "til og med").
-3. Velg animasjonshastighet, fargetema, og om trekningen skal vises i et eget
+1. Åpne `index.html` i nettleseren (via en lokal server, se under). Dette er
+   en velkomstside der du velger trekningsmodus.
+2. Velg **Trekk nummer** for å trekke unike enkeltnumre fra et intervall,
+   eller **Trekk fra bok** for å trekke en tilfeldig bok + et tilfeldig
+   nummer i den boken (samme bok/nummer-kombinasjon trekkes aldri to
+   ganger).
+3. Angi loddintervall ("fra og med" / "til og med"), og for bok-modus også
+   "Antall bøker".
+4. Velg animasjonshastighet, fargetema, og om trekningen skal vises i et eget
    vindu (f.eks. for en prosjektor).
-4. Klikk "Trekk" for å trekke ett og ett vinnernummer. Samme nummer trekkes
-   aldri to ganger i samme økt.
+5. Klikk "Trekk" for å trekke. I bok-modus ruller boknummeret ferdig først,
+   deretter nummeret i boken.
+
+## Sider
+
+- `index.html` — velkomstside, velg trekningsmodus.
+- `nummer-trekning.html` — kontrollpanel for nummer-trekning.
+- `bok-trekning.html` — kontrollpanel for bok-trekning.
+- `visning.html` — delt visningsvindu (prosjektor) for begge moduser, åpnes
+  automatisk av kontrollpanelene.
 
 ## Kjøre lokalt
 
