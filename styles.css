@@ -118,6 +118,10 @@ fieldset legend {
   font-weight: bold;
 }
 
+.history-section fieldset {
+  padding: 1rem;
+}
+
 .history-section ul {
   list-style: none;
   padding: 0;
