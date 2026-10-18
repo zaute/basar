@@ -2,6 +2,7 @@ import {
   validateInterval,
   createDrawState,
   drawNumber,
+  undrawNumber,
   remainingCount,
   isExhausted,
   runRollingAnimation,
@@ -24,6 +25,11 @@ let drawState = null;
 let displayWindow = null;
 let historyNumbers = [];
 let isDrawing = false;
+// Set while waiting for the display window to confirm it actually showed a
+// draw. If the window is closed before that happens, the draw is rolled
+// back instead of silently counting as "drawn".
+let pendingFinalize = null;
+let closeWatcherId = null;
 
 function getSelectedSpeed() {
   const checked = document.querySelector('input[name="speed"]:checked');
@@ -108,6 +114,14 @@ async function handleDraw() {
 
   await openDisplayWindowIfNeeded();
 
+  if (newWindowCheckbox.checked && (!displayWindow || displayWindow.closed)) {
+    // openDisplayWindowIfNeeded() already showed an error (e.g. popup
+    // blocked); don't consume a number for a draw nobody can see.
+    isDrawing = false;
+    drawButton.disabled = false;
+    return;
+  }
+
   const number = drawNumber(drawState);
   const speed = getSelectedSpeed();
   const theme = getSelectedTheme();
@@ -152,14 +166,24 @@ async function handleDraw() {
       },
     });
   } else {
-    runRollingAnimation({
-      from: drawState.from,
-      to: drawState.to,
-      finalNumber: number,
-      speed,
-      onTick: () => {},
-      onComplete: finalizeDraw,
-    });
+    // The display window shows/animates the draw itself (possibly after a
+    // click/space reveal gesture); we only finalize once it confirms the
+    // draw actually completed there, or roll back if the window is closed
+    // before that happens.
+    pendingFinalize = finalizeDraw;
+    closeWatcherId = setInterval(() => {
+      if (displayWindow && displayWindow.closed) {
+        clearInterval(closeWatcherId);
+        closeWatcherId = null;
+        pendingFinalize = null;
+        undrawNumber(drawState, number);
+        isDrawing = false;
+        drawButton.disabled = false;
+        showError(
+          'Visningsvinduet ble lukket før trekningen ble vist. Trukket tall ble ikke talt - prøv igjen.',
+        );
+      }
+    }, 300);
   }
 }
 
@@ -169,6 +193,11 @@ function resetAll() {
   drawState = null;
   historyNumbers = [];
   isDrawing = false;
+  if (closeWatcherId) {
+    clearInterval(closeWatcherId);
+    closeWatcherId = null;
+  }
+  pendingFinalize = null;
   fromInput.disabled = false;
   toInput.disabled = false;
   drawButton.disabled = false;
@@ -195,6 +224,16 @@ channel.onmessage = (event) => {
     handleDraw();
   } else if (message.type === 'request-reset') {
     resetAll();
+  } else if (message.type === 'draw-complete') {
+    if (pendingFinalize) {
+      if (closeWatcherId) {
+        clearInterval(closeWatcherId);
+        closeWatcherId = null;
+      }
+      const finalize = pendingFinalize;
+      pendingFinalize = null;
+      finalize();
+    }
   } else if (message.type === 'request-sync') {
     channel.postMessage({
       type: 'sync',

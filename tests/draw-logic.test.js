@@ -4,6 +4,7 @@ import {
   validateInterval,
   createDrawState,
   drawNumber,
+  undrawNumber,
   remainingCount,
   isExhausted,
   runRollingAnimation,
@@ -60,6 +61,16 @@ test('drawNumber throws once the interval is exhausted', () => {
   const state = createDrawState(1, 1);
   drawNumber(state);
   assert.throws(() => drawNumber(state), /allerede trukket/);
+});
+
+test('undrawNumber puts a drawn number back into the pool', () => {
+  const state = createDrawState(1, 3);
+  const number = drawNumber(state);
+  assert.equal(remainingCount(state), 2);
+
+  undrawNumber(state, number);
+  assert.equal(remainingCount(state), 3);
+  assert.equal(isExhausted(state), false);
 });
 
 test('runRollingAnimation ticks random numbers then completes with the final number', () => {

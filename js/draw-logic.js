@@ -44,6 +44,14 @@ export function drawNumber(state) {
   return number;
 }
 
+// Puts a drawn number back into the pool. Used when a draw couldn't be
+// completed/confirmed (e.g. the display window was closed before it could
+// show the result), so the number can be drawn again later instead of
+// being permanently lost.
+export function undrawNumber(state, number) {
+  state.drawnNumbers.delete(number);
+}
+
 export const ANIMATION_SPEEDS = {
   slow: { tickMs: 160, totalMs: 3000 },
   medium: { tickMs: 90, totalMs: 1600 },

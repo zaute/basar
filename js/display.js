@@ -53,6 +53,7 @@ function runDraw(message) {
       numberDisplay.textContent = String(n);
       addHistoryEntry(n);
       isAnimating = false;
+      channel.postMessage({ type: 'draw-complete' });
     },
   });
 }

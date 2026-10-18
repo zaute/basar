@@ -164,6 +164,7 @@ fieldset legend {
 html:has(#displayRoot),
 body:has(#displayRoot) {
   height: 100%;
+  overflow: hidden;
 }
 
 #displayRoot {
@@ -172,7 +173,7 @@ body:has(#displayRoot) {
   flex-direction: column;
   align-items: stretch;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
 #displayRoot .number-area {
