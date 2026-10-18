@@ -15,3 +15,31 @@ export function validateInterval(fromInput, toInput) {
   }
   return { valid: true, from, to };
 }
+
+export function createDrawState(from, to) {
+  return { from, to, drawnNumbers: new Set() };
+}
+
+export function remainingCount(state) {
+  return state.to - state.from + 1 - state.drawnNumbers.size;
+}
+
+export function isExhausted(state) {
+  return remainingCount(state) <= 0;
+}
+
+export function drawNumber(state) {
+  if (isExhausted(state)) {
+    throw new Error('Alle numre i intervallet er allerede trukket.');
+  }
+  const remaining = [];
+  for (let n = state.from; n <= state.to; n++) {
+    if (!state.drawnNumbers.has(n)) {
+      remaining.push(n);
+    }
+  }
+  const index = Math.floor(Math.random() * remaining.length);
+  const number = remaining[index];
+  state.drawnNumbers.add(number);
+  return number;
+}
