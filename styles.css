@@ -29,6 +29,7 @@ body {
   margin-top: 0;
 }
 
+.history-section,
 .interval-section,
 .settings-section {
   display: flex;
