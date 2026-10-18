@@ -69,18 +69,18 @@ fieldset legend {
 }
 
 #resetButton {
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
+  font-size: 1.5rem;
+  padding: 0.75rem 2rem;
   cursor: pointer;
-  background: transparent;
+  background: var(--color-accent-gold);
   color: var(--color-primary-green);
-  border: 1px solid var(--color-primary-green);
+  border: none;
   border-radius: 8px;
+  font-weight: bold;
 }
 
 #resetButton:hover {
-  background: var(--color-primary-green);
-  color: var(--color-card);
+  background: var(--color-accent-gold-dark);
 }
 
 #errorMessage {
