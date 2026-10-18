@@ -120,22 +120,25 @@ fieldset legend {
 }
 
 .history-section fieldset {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .history-section ul {
   list-style: none;
   padding: 0;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  max-height: 4.5rem;
+  overflow-y: auto;
 }
 
 .history-section li {
   background: #f1e6c8;
   color: var(--color-primary-green);
   border-radius: 4px;
-  padding: 0.25rem 0.75rem;
+  padding: 0.15rem 0.6rem;
   font-weight: bold;
 }
 
