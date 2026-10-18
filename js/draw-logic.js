@@ -16,6 +16,17 @@ export function validateInterval(fromInput, toInput) {
   return { valid: true, from, to };
 }
 
+export function validateBookCount(countInput) {
+  const count = Number(countInput);
+  const countIsValid =
+    countInput !== '' && Number.isInteger(count) && count >= 1;
+
+  if (!countIsValid) {
+    return { valid: false, error: 'Antall bøker må være et helt tall større enn 0.' };
+  }
+  return { valid: true, count };
+}
+
 export function createDrawState(from, to) {
   return { from, to, drawnNumbers: new Set() };
 }
@@ -52,6 +63,25 @@ export function undrawNumber(state, number) {
   state.drawnNumbers.delete(number);
 }
 
+// A book-draw combines a book number and a number-within-the-book into a
+// single combined index, so the existing draw-without-replacement logic
+// (createDrawState/drawNumber/undrawNumber) can be reused unchanged by
+// treating the whole book x number space as one flat interval
+// [0, bookCount * rangeSize - 1]. These two functions translate between a
+// combined index and the { book, number } pair people actually care about.
+// Books are numbered starting at 1.
+export function decodeBookDraw(index, from, to) {
+  const rangeSize = to - from + 1;
+  const book = Math.floor(index / rangeSize) + 1;
+  const number = from + (index % rangeSize);
+  return { book, number };
+}
+
+export function encodeBookDraw(book, number, from, to) {
+  const rangeSize = to - from + 1;
+  return (book - 1) * rangeSize + (number - from);
+}
+
 export const ANIMATION_SPEEDS = {
   slow: { tickMs: 160, totalMs: 3000 },
   medium: { tickMs: 90, totalMs: 1600 },
@@ -74,9 +104,16 @@ export function runRollingAnimation({
     throw new Error(`Ukjent hastighet: ${speed}`);
   }
   const { tickMs, totalMs } = settings;
-  const startTime = now();
+  // Captured lazily on the first tick (rather than at setup time) so that
+  // chained animations (e.g. runBookDrawAnimation's number phase, started
+  // from within the book phase's onComplete) measure elapsed time from
+  // when they actually start ticking.
+  let startTime = null;
 
   const intervalId = setIntervalFn(() => {
+    if (startTime === null) {
+      startTime = now();
+    }
     const elapsed = now() - startTime;
     if (elapsed >= totalMs) {
       clearIntervalFn(intervalId);
@@ -88,4 +125,50 @@ export function runRollingAnimation({
   }, tickMs);
 
   return intervalId;
+}
+
+// Plays the book-rolling animation to completion, then plays the
+// number-rolling animation to completion, then calls onComplete with both
+// final values. Reuses runRollingAnimation for each phase instead of
+// duplicating the timing logic.
+export function runBookDrawAnimation({
+  bookFrom,
+  bookTo,
+  finalBook,
+  numberFrom,
+  numberTo,
+  finalNumber,
+  speed,
+  onBookTick,
+  onNumberTick,
+  onComplete,
+  setIntervalFn = setInterval,
+  clearIntervalFn = clearInterval,
+  now = Date.now,
+}) {
+  runRollingAnimation({
+    from: bookFrom,
+    to: bookTo,
+    finalNumber: finalBook,
+    speed,
+    onTick: onBookTick,
+    onComplete: (book) => {
+      runRollingAnimation({
+        from: numberFrom,
+        to: numberTo,
+        finalNumber,
+        speed,
+        onTick: onNumberTick,
+        onComplete: (number) => {
+          onComplete(book, number);
+        },
+        setIntervalFn,
+        clearIntervalFn,
+        now,
+      });
+    },
+    setIntervalFn,
+    clearIntervalFn,
+    now,
+  });
 }

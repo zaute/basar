@@ -2,12 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   validateInterval,
+  validateBookCount,
   createDrawState,
   drawNumber,
   undrawNumber,
+  decodeBookDraw,
+  encodeBookDraw,
   remainingCount,
   isExhausted,
   runRollingAnimation,
+  runBookDrawAnimation,
 } from '../js/draw-logic.js';
 
 test('validateInterval accepts a valid interval', () => {
@@ -127,4 +131,109 @@ test('runRollingAnimation rejects an unknown speed', () => {
       }),
     /ukjent hastighet/i,
   );
+});
+
+test('validateBookCount accepts a positive integer', () => {
+  const result = validateBookCount('5');
+  assert.deepEqual(result, { valid: true, count: 5 });
+});
+
+test('validateBookCount rejects zero', () => {
+  const result = validateBookCount('0');
+  assert.equal(result.valid, false);
+  assert.match(result.error, /helt tall/);
+});
+
+test('validateBookCount rejects non-numeric input', () => {
+  const result = validateBookCount('abc');
+  assert.equal(result.valid, false);
+  assert.match(result.error, /helt tall/);
+});
+
+test('validateBookCount rejects empty input', () => {
+  const result = validateBookCount('');
+  assert.equal(result.valid, false);
+  assert.match(result.error, /helt tall/);
+});
+
+test('decodeBookDraw maps index 0 to the first book and the lowest number', () => {
+  assert.deepEqual(decodeBookDraw(0, 1, 100), { book: 1, number: 1 });
+});
+
+test('decodeBookDraw maps the last index to the last book and the highest number', () => {
+  // 3 books, range 1-100 => rangeSize 100, totalCombos 300, last index 299
+  assert.deepEqual(decodeBookDraw(299, 1, 100), { book: 3, number: 100 });
+});
+
+test('decodeBookDraw wraps to the next book at a range boundary', () => {
+  // rangeSize 100 (1-100): index 99 is book 1 number 100, index 100 is book 2 number 1
+  assert.deepEqual(decodeBookDraw(99, 1, 100), { book: 1, number: 100 });
+  assert.deepEqual(decodeBookDraw(100, 1, 100), { book: 2, number: 1 });
+});
+
+test('encodeBookDraw is the inverse of decodeBookDraw', () => {
+  for (const index of [0, 1, 99, 100, 299]) {
+    const { book, number } = decodeBookDraw(index, 1, 100);
+    assert.equal(encodeBookDraw(book, number, 1, 100), index);
+  }
+});
+
+test('runBookDrawAnimation rolls the book first, then the number, then completes', () => {
+  let fakeNow = 0;
+  const callbacks = [];
+  const bookTicks = [];
+  const numberTicks = [];
+  let completedWith = null;
+
+  const fakeSetInterval = (callback) => {
+    callbacks.push(callback);
+    return callbacks.length;
+  };
+  const fakeClearInterval = () => {};
+
+  runBookDrawAnimation({
+    bookFrom: 1,
+    bookTo: 3,
+    finalBook: 2,
+    numberFrom: 1,
+    numberTo: 100,
+    finalNumber: 42,
+    speed: 'fast',
+    onBookTick: (book) => bookTicks.push(book),
+    onNumberTick: (number) => numberTicks.push(number),
+    onComplete: (book, number) => {
+      completedWith = { book, number };
+    },
+    setIntervalFn: fakeSetInterval,
+    clearIntervalFn: fakeClearInterval,
+    now: () => fakeNow,
+  });
+
+  // First interval registered is the book-rolling phase.
+  assert.equal(callbacks.length, 1);
+
+  // Tick the book phase once (still rolling), then let it finish.
+  fakeNow += 100;
+  callbacks[0]();
+  assert.equal(bookTicks.length, 1);
+  assert.equal(numberTicks.length, 0);
+  assert.equal(completedWith, null);
+
+  fakeNow += 1000;
+  callbacks[0]();
+  // Book phase is done; the number phase should now have registered its
+  // own interval.
+  assert.equal(callbacks.length, 2);
+  assert.equal(completedWith, null);
+
+  // Tick the number phase once (still rolling), then let it finish.
+  fakeNow = 0;
+  fakeNow += 100;
+  callbacks[1]();
+  assert.equal(numberTicks.length, 1);
+  assert.equal(completedWith, null);
+
+  fakeNow += 1000;
+  callbacks[1]();
+  assert.deepEqual(completedWith, { book: 2, number: 42 });
 });
