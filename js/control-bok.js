@@ -104,13 +104,13 @@ createDrawController({
       finalNumber: result.number,
       speed,
       onBookTick: (book) => {
-        inlineNumber.textContent = `Bok ${book}`;
+        inlineNumber.textContent = `${book}`;
       },
       onNumberTick: (number) => {
-        inlineNumber.textContent = `Bok ${result.book} — nummer ${number}`;
+        inlineNumber.textContent = `${result.book}-${number}`;
       },
       onComplete: (book, number) => {
-        inlineNumber.textContent = `Bok ${book} — nummer ${number}`;
+        inlineNumber.textContent = `${book}-${number}`;
         onComplete();
       },
     });

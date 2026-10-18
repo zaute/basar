@@ -65,13 +65,13 @@ function runDraw(message) {
       finalNumber: message.finalNumber,
       speed: message.speed,
       onBookTick: (book) => {
-        numberDisplay.textContent = `Bok ${book}`;
+        numberDisplay.textContent = `${book}`;
       },
       onNumberTick: (number) => {
-        numberDisplay.textContent = `Bok ${message.finalBook} — nummer ${number}`;
+        numberDisplay.textContent = `${message.finalBook}-${number}`;
       },
       onComplete: (book, number) => {
-        numberDisplay.textContent = `Bok ${book} — nummer ${number}`;
+        numberDisplay.textContent = `${book}-${number}`;
         addHistoryEntry({ book, number });
         isAnimating = false;
         channel.postMessage({ type: 'draw-complete' });
