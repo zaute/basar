@@ -5,7 +5,6 @@ import {
   undrawNumber,
   remainingCount,
   isExhausted,
-  runRollingAnimation,
 } from './draw-logic.js';
 import { createDrawController } from './control-shared.js';
 
@@ -34,9 +33,6 @@ createDrawController({
     errorMessage: document.getElementById('errorMessage'),
     historyList: document.getElementById('historyList'),
     remainingCountEl: document.getElementById('remainingCount'),
-    newWindowCheckbox: document.getElementById('newWindowCheckbox'),
-    inlineDisplay: document.getElementById('inlineDisplay'),
-    inlineNumber: document.getElementById('inlineNumber'),
   },
   getSelectedSpeed,
   getSelectedTheme,
@@ -67,21 +63,6 @@ createDrawController({
     finalNumber: number,
   }),
   formatHistoryEntry: (number) => String(number),
-  runInlineAnimation(state, number, speed, inlineNumber, onComplete) {
-    runRollingAnimation({
-      from: state.from,
-      to: state.to,
-      finalNumber: number,
-      speed,
-      onTick: (n) => {
-        inlineNumber.textContent = String(n);
-      },
-      onComplete: (n) => {
-        inlineNumber.textContent = String(n);
-        onComplete();
-      },
-    });
-  },
   resetExtra() {
     drawState = null;
     fromInput.disabled = false;

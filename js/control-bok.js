@@ -8,7 +8,6 @@ import {
   encodeBookDraw,
   remainingCount,
   isExhausted,
-  runBookDrawAnimation,
 } from './draw-logic.js';
 import { createDrawController } from './control-shared.js';
 
@@ -41,9 +40,6 @@ createDrawController({
     errorMessage: document.getElementById('errorMessage'),
     historyList: document.getElementById('historyList'),
     remainingCountEl: document.getElementById('remainingCount'),
-    newWindowCheckbox: document.getElementById('newWindowCheckbox'),
-    inlineDisplay: document.getElementById('inlineDisplay'),
-    inlineNumber: document.getElementById('inlineNumber'),
   },
   getSelectedSpeed,
   getSelectedTheme,
@@ -94,27 +90,6 @@ createDrawController({
     finalNumber: result.number,
   }),
   formatHistoryEntry: (result) => `${result.book}-${result.number}`,
-  runInlineAnimation(state, result, speed, inlineNumber, onComplete) {
-    runBookDrawAnimation({
-      bookFrom: 1,
-      bookTo: bookCount,
-      finalBook: result.book,
-      numberFrom: rangeFrom,
-      numberTo: rangeTo,
-      finalNumber: result.number,
-      speed,
-      onBookTick: (book) => {
-        inlineNumber.textContent = `${book}`;
-      },
-      onNumberTick: (number) => {
-        inlineNumber.textContent = `${result.book}-${number}`;
-      },
-      onComplete: (book, number) => {
-        inlineNumber.textContent = `${book}-${number}`;
-        onComplete();
-      },
-    });
-  },
   resetExtra() {
     drawState = null;
     rangeFrom = 0;

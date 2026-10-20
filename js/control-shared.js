@@ -20,7 +20,6 @@ export function createDrawController(config) {
     undoDraw,
     buildDrawMessage,
     formatHistoryEntry,
-    runInlineAnimation,
     resetExtra,
   } = config;
 
@@ -30,9 +29,6 @@ export function createDrawController(config) {
     errorMessage,
     historyList,
     remainingCountEl,
-    newWindowCheckbox,
-    inlineDisplay,
-    inlineNumber,
   } = elements;
 
   const channel = new BroadcastChannel(channelName);
@@ -63,9 +59,6 @@ export function createDrawController(config) {
   }
 
   function openDisplayWindowIfNeeded() {
-    if (!newWindowCheckbox.checked) {
-      return Promise.resolve();
-    }
     if (displayWindow && !displayWindow.closed) {
       return Promise.resolve();
     }
@@ -107,7 +100,7 @@ export function createDrawController(config) {
 
     await openDisplayWindowIfNeeded();
 
-    if (newWindowCheckbox.checked && (!displayWindow || displayWindow.closed)) {
+    if (!displayWindow || displayWindow.closed) {
       // openDisplayWindowIfNeeded() already showed an error (e.g. popup
       // blocked); don't consume a draw nobody can see.
       isDrawing = false;
@@ -140,30 +133,24 @@ export function createDrawController(config) {
       }
     }
 
-    if (!newWindowCheckbox.checked) {
-      inlineDisplay.hidden = false;
-      inlineDisplay.className = `display theme-${theme}`;
-      runInlineAnimation(state, result, speed, inlineNumber, finalizeDraw);
-    } else {
-      // The display window shows/animates the draw itself (possibly after
-      // a click/space reveal gesture); we only finalize once it confirms
-      // the draw actually completed there, or roll back if the window is
-      // closed before that happens.
-      pendingFinalize = finalizeDraw;
-      closeWatcherId = setInterval(() => {
-        if (displayWindow && displayWindow.closed) {
-          clearInterval(closeWatcherId);
-          closeWatcherId = null;
-          pendingFinalize = null;
-          undoDraw(state, result);
-          isDrawing = false;
-          drawButton.disabled = false;
-          showError(
-            'Visningsvinduet ble lukket før trekningen ble vist. Trukket resultat ble ikke talt - prøv igjen.',
-          );
-        }
-      }, 300);
-    }
+    // The display window shows/animates the draw itself (possibly after
+    // a click/space reveal gesture); we only finalize once it confirms
+    // the draw actually completed there, or roll back if the window is
+    // closed before that happens.
+    pendingFinalize = finalizeDraw;
+    closeWatcherId = setInterval(() => {
+      if (displayWindow && displayWindow.closed) {
+        clearInterval(closeWatcherId);
+        closeWatcherId = null;
+        pendingFinalize = null;
+        undoDraw(state, result);
+        isDrawing = false;
+        drawButton.disabled = false;
+        showError(
+          'Visningsvinduet ble lukket før trekningen ble vist. Trukket resultat ble ikke talt - prøv igjen.',
+        );
+      }
+    }, 300);
   }
 
   function resetAll() {
@@ -178,8 +165,6 @@ export function createDrawController(config) {
     historyList.innerHTML = '';
     remainingCountEl.textContent = '—';
     showError('');
-    inlineDisplay.hidden = true;
-    inlineNumber.textContent = '\u00A0';
     resetExtra();
     channel.postMessage({ type: 'reset' });
   }

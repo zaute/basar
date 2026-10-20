@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
   <meta charset="UTF-8">
   <title>Trekk fra bok - julebasar</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <main class="control-panel">
     <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
-    <h1>Trekk fra bok — Betania julebasar</h1>
+    <h1>Trekk fra bok</h1>
 
     <section class="interval-section">
       <fieldset>
@@ -42,13 +44,6 @@
         <label><input type="radio" name="theme" value="light"> Hvit bakgrunn, svart tekst</label>
       </fieldset>
 
-      <fieldset>
-        <legend>Visning</legend>
-        <label>
-          <input type="checkbox" id="newWindowCheckbox" checked>
-          Åpne trekning i eget vindu
-        </label>
-      </fieldset>
     </section>
 
     <section class="history-section">
@@ -63,12 +58,9 @@
       <button id="resetButton" type="button">Nullstill</button>
     </div>
     <p id="errorMessage" role="alert" hidden></p>
-
-    <section id="inlineDisplay" class="display" hidden>
-      <div id="inlineNumber" class="number">&nbsp;</div>
-    </section>
   </main>
 
   <script type="module" src="js/control-bok.js"></script>
 </body>
+
 </html>
