@@ -293,3 +293,32 @@ body:has(#displayRoot) {
 .welcome-button:hover {
   background: var(--color-accent-gold-dark);
 }
+
+@media (max-width: 600px) {
+  .control-panel {
+    margin: 0;
+    padding: 1.25rem;
+    border-radius: 0;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .button-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  #drawButton,
+  #resetButton {
+    width: 100%;
+    font-size: 1.25rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .welcome-button {
+    font-size: 1.5rem;
+    padding: 1.5rem;
+    min-height: 6rem;
+  }
+}
