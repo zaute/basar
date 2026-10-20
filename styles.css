@@ -29,6 +29,13 @@ body {
   margin-top: 0;
 }
 
+.explainer {
+  color: var(--color-primary-green);
+  text-align: center;
+  opacity: 0.75;
+  margin-top: 0;
+}
+
 .back-link {
   display: inline-block;
   margin-bottom: 1rem;

@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Trekk fra bok - julebasar</title>
+  <title>Trekk fra bok</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
   <main class="control-panel">
-    <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
     <h1>Trekk fra bok</h1>
+    <p class="explainer">Trekningen åpnes i nytt vindu. Samme nummer trekkes aldri på nytt.</p>
 
     <section class="interval-section">
       <fieldset>
@@ -21,7 +21,7 @@
         </label>
         <label>
           Til og med
-          <input type="number" id="toInput" value="100" min="1" max="999">
+          <input type="number" id="toInput" value="20" min="1" max="999">
         </label>
         <label>
           Antall bøker
@@ -58,6 +58,7 @@
       <button id="resetButton" type="button">Nullstill</button>
     </div>
     <p id="errorMessage" role="alert" hidden></p>
+    <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
   </main>
 
   <script type="module" src="js/control-bok.js"></script>
