@@ -37,7 +37,7 @@ function formatEntry(entry) {
   return String(entry);
 }
 
-const FIREWORKS_DURATION_MS = 10000;
+const FIREWORKS_DURATION_MS = 5000;
 const ROCKET_FLIGHT_MS = 900;
 const LAUNCH_INTERVAL_MIN_MS = 350;
 const LAUNCH_INTERVAL_MAX_MS = 750;
@@ -171,6 +171,7 @@ function renderHistory(history) {
 }
 
 function runDraw(message) {
+  cancelFireworks();
   isAnimating = true;
   clearPrompt();
   numberDisplay.textContent = '\u00A0';
