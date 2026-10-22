@@ -23,6 +23,10 @@ function getSelectedTheme() {
   return checked ? checked.value : 'dark';
 }
 
+function getSelectedEffects() {
+  return document.getElementById('effectsInput').checked;
+}
+
 createDrawController({
   channelName: 'loddtrekning-nummer',
   displayUrl: 'visning.html?mode=nummer',
@@ -36,6 +40,7 @@ createDrawController({
   },
   getSelectedSpeed,
   getSelectedTheme,
+  getSelectedEffects,
   exhaustedMessage: 'Alle numre i intervallet er trukket.',
   ensureState(showError) {
     if (drawState) {

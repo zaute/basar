@@ -11,6 +11,7 @@ export function createDrawController(config) {
     elements,
     getSelectedSpeed,
     getSelectedTheme,
+    getSelectedEffects,
     exhaustedMessage,
     ensureState,
     getState,
@@ -111,11 +112,13 @@ export function createDrawController(config) {
     const result = performDraw(state);
     const speed = getSelectedSpeed();
     const theme = getSelectedTheme();
+    const effects = getSelectedEffects ? getSelectedEffects() : false;
 
     channel.postMessage({
       type: 'draw',
       speed,
       theme,
+      effects,
       ...buildDrawMessage(state, result),
     });
 

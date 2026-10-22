@@ -30,6 +30,10 @@ function getSelectedTheme() {
   return checked ? checked.value : 'dark';
 }
 
+function getSelectedEffects() {
+  return document.getElementById('effectsInput').checked;
+}
+
 createDrawController({
   channelName: 'loddtrekning-bok',
   displayUrl: 'visning.html?mode=bok',
@@ -43,6 +47,7 @@ createDrawController({
   },
   getSelectedSpeed,
   getSelectedTheme,
+  getSelectedEffects,
   exhaustedMessage: 'Alle bok- og nummerkombinasjoner er trukket.',
   ensureState(showError) {
     if (drawState) {

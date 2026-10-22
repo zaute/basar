@@ -209,6 +209,38 @@ body:has(#displayRoot) {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.explosion {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.explosion .particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  border-radius: 50%;
+  animation: explode-particle 0.9s ease-out forwards;
+}
+
+@keyframes explode-particle {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    opacity: 0;
+  }
 }
 
 #displayRoot .number {

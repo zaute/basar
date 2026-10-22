@@ -37,6 +37,39 @@ function formatEntry(entry) {
   return String(entry);
 }
 
+const EXPLOSION_PARTICLE_COUNT = 24;
+const EXPLOSION_COLORS = ['#d4af37', '#fff8dc', '#ff6b6b', '#4dd4ff', '#8aff8a'];
+
+// A lightweight, dependency-free "explosion" of small particles bursting
+// outward from the number and fading out. Purely decorative; only shown
+// when the control panel has opted in via message.effects.
+function triggerExplosion() {
+  const area = document.querySelector('.number-area');
+  if (!area) {
+    return;
+  }
+  const container = document.createElement('div');
+  container.className = 'explosion';
+  for (let i = 0; i < EXPLOSION_PARTICLE_COUNT; i++) {
+    const particle = document.createElement('span');
+    particle.className = 'particle';
+    const angle = (Math.PI * 2 * i) / EXPLOSION_PARTICLE_COUNT
+      + Math.random() * 0.4;
+    const distance = 120 + Math.random() * 180;
+    particle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+    particle.style.background =
+      EXPLOSION_COLORS[Math.floor(Math.random() * EXPLOSION_COLORS.length)];
+    container.appendChild(particle);
+  }
+  area.appendChild(container);
+  container.addEventListener('animationend', () => container.remove(), {
+    once: true,
+  });
+  // Safety net in case animationend doesn't fire for some reason.
+  setTimeout(() => container.remove(), 1200);
+}
+
 function addHistoryEntry(entry) {
   const item = document.createElement('li');
   item.textContent = formatEntry(entry);
@@ -73,6 +106,9 @@ function runDraw(message) {
       onComplete: (book, number) => {
         numberDisplay.textContent = `${book}-${number}`;
         addHistoryEntry({ book, number });
+        if (message.effects) {
+          triggerExplosion();
+        }
         isAnimating = false;
         channel.postMessage({ type: 'draw-complete' });
       },
@@ -91,6 +127,9 @@ function runDraw(message) {
     onComplete: (n) => {
       numberDisplay.textContent = String(n);
       addHistoryEntry(n);
+      if (message.effects) {
+        triggerExplosion();
+      }
       isAnimating = false;
       channel.postMessage({ type: 'draw-complete' });
     },
