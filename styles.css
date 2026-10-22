@@ -213,32 +213,54 @@ body:has(#displayRoot) {
 }
 
 .explosion {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   width: 0;
   height: 0;
   pointer-events: none;
+  z-index: 1000;
 }
 
-.explosion .particle {
+.explosion .shockwave {
   position: absolute;
   top: 0;
   left: 0;
   width: 10px;
   height: 10px;
   margin: -5px;
+  border: 0.4rem solid var(--color-accent-gold);
   border-radius: 50%;
-  animation: explode-particle 0.9s ease-out forwards;
+  animation: explode-shockwave 0.6s ease-out forwards;
+}
+
+.explosion .particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 1em currentColor;
+  animation: explode-particle 1.1s cubic-bezier(0.15, 0.6, 0.3, 1) forwards;
 }
 
 @keyframes explode-particle {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
   100% {
-    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes explode-shockwave {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(40);
     opacity: 0;
   }
 }
