@@ -322,6 +322,18 @@ body:has(#displayRoot) {
   font-weight: bold;
 }
 
+@media (max-width: 600px) {
+  .viewer-history {
+    gap: 0.15rem;
+  }
+
+  .viewer-history li {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+  }
+}
+
 .theme-dark {
   background: #000;
   color: #fff;
