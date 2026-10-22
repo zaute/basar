@@ -265,6 +265,21 @@ body:has(#displayRoot) {
   }
 }
 
+.firework-rocket {
+  position: fixed;
+  bottom: 0;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--rocket-color, #fff8dc);
+  box-shadow:
+    0 0 6px 2px var(--rocket-color, #fff8dc),
+    0 18px 22px -6px var(--rocket-color, #fff8dc);
+  pointer-events: none;
+  z-index: 1000;
+}
+
 #displayRoot .number {
   text-shadow: 0 0 0.5em var(--color-accent-gold);
 }

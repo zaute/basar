@@ -37,38 +37,47 @@ function formatEntry(entry) {
   return String(entry);
 }
 
-const EXPLOSION_PARTICLE_COUNT = 60;
-const EXPLOSION_COLORS = ['#d4af37', '#fff8dc', '#ff6b6b', '#4dd4ff', '#8aff8a'];
+const FIREWORKS_DURATION_MS = 10000;
+const ROCKET_FLIGHT_MS = 900;
+const LAUNCH_INTERVAL_MIN_MS = 350;
+const LAUNCH_INTERVAL_MAX_MS = 750;
+const BURST_PARTICLE_COUNT = 40;
+const FIREWORK_COLORS = ['#d4af37', '#fff8dc', '#ff6b6b', '#4dd4ff', '#8aff8a', '#ff8ad4'];
 
-// A lightweight, dependency-free "explosion" of particles bursting outward
-// across the whole screen and fading out, plus a quick shockwave ring.
-// Purely decorative; only shown when the control panel has opted in via
-// message.effects.
-function triggerExplosion() {
+// Timeout ids for any in-flight fireworks schedule, so a reset can cancel
+// a show that's still running instead of leaving it to finish on its own.
+let fireworksTimeoutIds = [];
+
+function randomColor() {
+  return FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)];
+}
+
+// A burst of particles exploding outward from a single screen point (plus
+// a quick shockwave ring), used for each firework's "pop" at the top of
+// its flight.
+function burst(x, y) {
   const container = document.createElement('div');
   container.className = 'explosion';
+  container.style.left = `${x}px`;
+  container.style.top = `${y}px`;
 
   const ring = document.createElement('span');
   ring.className = 'shockwave';
+  ring.style.borderColor = randomColor();
   container.appendChild(ring);
 
-  // Particles should reach well past the screen edges regardless of
-  // window size/aspect ratio, so the burst always feels screen-filling.
-  const maxDistance = Math.hypot(window.innerWidth, window.innerHeight) / 2;
-
-  for (let i = 0; i < EXPLOSION_PARTICLE_COUNT; i++) {
+  const maxDistance = 150 + Math.random() * 180;
+  for (let i = 0; i < BURST_PARTICLE_COUNT; i++) {
     const particle = document.createElement('span');
     particle.className = 'particle';
-    const angle = (Math.PI * 2 * i) / EXPLOSION_PARTICLE_COUNT
-      + Math.random() * 0.4;
+    const angle = (Math.PI * 2 * i) / BURST_PARTICLE_COUNT + Math.random() * 0.4;
     const distance = maxDistance * (0.5 + Math.random() * 0.6);
     particle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
     particle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
-    const size = 14 + Math.random() * 14;
+    const size = 10 + Math.random() * 10;
     particle.style.width = `${size}px`;
     particle.style.height = `${size}px`;
-    particle.style.background =
-      EXPLOSION_COLORS[Math.floor(Math.random() * EXPLOSION_COLORS.length)];
+    particle.style.background = randomColor();
     container.appendChild(particle);
   }
   document.body.appendChild(container);
@@ -77,6 +86,75 @@ function triggerExplosion() {
   });
   // Safety net in case animationend doesn't fire for some reason.
   setTimeout(() => container.remove(), 1800);
+}
+
+// A single rocket rising from the bottom of the screen to a random point,
+// then popping into a burst there.
+function launchRocket() {
+  const rocket = document.createElement('div');
+  rocket.className = 'firework-rocket';
+  const xVw = 10 + Math.random() * 80;
+  const targetYVh = 100 - (15 + Math.random() * 45);
+  rocket.style.left = `${xVw}vw`;
+  rocket.style.setProperty('--rocket-color', randomColor());
+  document.body.appendChild(rocket);
+
+  // Start at the bottom, then trigger the transition to the target height
+  // on the next frame so the browser registers the starting position
+  // first instead of jumping straight there.
+  rocket.style.bottom = '0';
+  requestAnimationFrame(() => {
+    rocket.style.transition = `bottom ${ROCKET_FLIGHT_MS}ms ease-out`;
+    rocket.style.bottom = `${100 - targetYVh}vh`;
+  });
+
+  rocket.addEventListener(
+    'transitionend',
+    () => {
+      const rect = rocket.getBoundingClientRect();
+      burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      rocket.remove();
+    },
+    { once: true },
+  );
+  // Safety net in case transitionend doesn't fire for some reason.
+  setTimeout(() => rocket.remove(), ROCKET_FLIGHT_MS + 500);
+}
+
+// Launches rockets at randomized intervals for FIREWORKS_DURATION_MS,
+// giving a fireworks show that explodes at different spots across the
+// whole screen over roughly 10 seconds. Purely decorative; only shown
+// when the control panel has opted in via message.effects.
+function triggerExplosion() {
+  for (const id of fireworksTimeoutIds) {
+    clearTimeout(id);
+  }
+  fireworksTimeoutIds = [];
+
+  const startTime = Date.now();
+  function scheduleNext() {
+    launchRocket();
+    if (Date.now() - startTime >= FIREWORKS_DURATION_MS) {
+      return;
+    }
+    const delay = LAUNCH_INTERVAL_MIN_MS
+      + Math.random() * (LAUNCH_INTERVAL_MAX_MS - LAUNCH_INTERVAL_MIN_MS);
+    fireworksTimeoutIds.push(setTimeout(scheduleNext, delay));
+  }
+  scheduleNext();
+}
+
+// Cancels any in-progress fireworks show (pending rocket launches) and
+// removes any rockets/bursts currently in the DOM, e.g. when the control
+// panel is reset mid-show.
+function cancelFireworks() {
+  for (const id of fireworksTimeoutIds) {
+    clearTimeout(id);
+  }
+  fireworksTimeoutIds = [];
+  document
+    .querySelectorAll('.firework-rocket, .explosion')
+    .forEach((el) => el.remove());
 }
 
 function addHistoryEntry(entry) {
@@ -181,6 +259,7 @@ channel.onmessage = (event) => {
     clearPrompt();
     numberDisplay.textContent = '\u00A0';
     historyList.innerHTML = '';
+    cancelFireworks();
     return;
   }
 
